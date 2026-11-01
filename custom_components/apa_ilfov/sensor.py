@@ -38,6 +38,7 @@ def _rezumat(f: Factura) -> dict[str, Any]:
         "index_vechi": f.apa.index_vechi if f.apa else None,
         "index_nou": f.apa.index_nou if f.apa else None,
         "tip_citire": f.apa.tip if f.apa else None,
+        "ajustare": f.ajustare,
     }
 
 

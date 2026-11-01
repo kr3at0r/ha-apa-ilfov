@@ -29,6 +29,8 @@ from .const import (
 )
 from .parser import Factura
 
+PARSER_VERSION = 2  # crește când se schimbă regulile de parsare: se reciti tot istoricul
+
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
 
@@ -57,6 +59,7 @@ class ApaIlfovCoordinator(DataUpdateCoordinator[ApaData]):
         self._state: dict = {}
         self._facturi: dict[str, Factura] = {}
         self._init_done = False
+        self._reindex = False
         self._client = ApaIlfovClient(
             entry.data[CONF_SERVER],
             int(entry.data[CONF_PORT]),
@@ -68,6 +71,10 @@ class ApaIlfovCoordinator(DataUpdateCoordinator[ApaData]):
 
     async def async_load(self) -> None:
         data = await self._store.async_load() or {}
+        if data.get("parser_version") != PARSER_VERSION:
+            # reguli noi de parsare: reiau citirea tuturor mailurilor (fără notificări)
+            self._reindex = bool(data)
+            data = {"init_done": bool(data.get("init_done"))}
         self._state = data.get("state", {})
         self._init_done = bool(data.get("init_done"))
         for k, v in data.get("facturi", {}).items():
@@ -81,6 +88,7 @@ class ApaIlfovCoordinator(DataUpdateCoordinator[ApaData]):
             {
                 "state": self._state,
                 "init_done": self._init_done,
+                "parser_version": PARSER_VERSION,
                 "facturi": {k: v.to_dict() for k, v in self._facturi.items()},
             }
         )
@@ -104,8 +112,9 @@ class ApaIlfovCoordinator(DataUpdateCoordinator[ApaData]):
                     noi.append(f)
 
         self._state = new_state
-        first_run = not self._init_done
+        first_run = not self._init_done or self._reindex
         self._init_done = True
+        self._reindex = False
         if mesaje or first_run:
             await self._save()
 

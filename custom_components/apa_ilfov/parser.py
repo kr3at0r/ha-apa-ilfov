@@ -70,6 +70,7 @@ class Factura:
     apa: Linie | None = None
     canal: Linie | None = None
     sursa: str = "pdf"  # pdf | mail
+    ajustare: float = 0.0  # total − suma liniilor (negativ = credit / sold anterior)
     avertismente: list[str] = field(default_factory=list)
 
     @property
@@ -191,7 +192,12 @@ def _verifica(f: Factura) -> None:
                 w.append(f"{nume}: index nou − vechi ≠ cantitate")
     suma = sum((ln.valoare + ln.tva) for ln in (f.apa, f.canal) if ln)
     if f.total and abs(suma - f.total) > 0.02:
-        w.append("suma liniilor ≠ total de plată")
+        f.ajustare = round(f.total - suma, 2)
+        if f.ajustare > 0:
+            # total mai mare decât liniile: ceva în plus (penalități etc.) -> de verificat
+            w.append("suma liniilor ≠ total de plată")
+        # total mai mic: credit / sold anterior (ex. regularizare după schimbarea
+        # apometrului) -> doar informativ, vezi `ajustare`
 
 
 def parse_pdf(data: bytes) -> Factura:
