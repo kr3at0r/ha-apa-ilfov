@@ -30,7 +30,7 @@ from .const import (
 )
 from .parser import Factura
 
-PARSER_VERSION = 2  # crește când se schimbă regulile de parsare: se reciti tot istoricul
+PARSER_VERSION = 3  # crește când se schimbă regulile de parsare: se reciti tot istoricul
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -144,6 +144,8 @@ class ApaIlfovCoordinator(DataUpdateCoordinator[ApaData]):
             EVENT_NEW_INVOICE,
             {
                 "total": f.total,
+                "curenta": f.curenta,
+                "sold": f.sold,
                 "scadenta": f.scadenta,
                 "emisa": f.emisa,
                 "perioada": f.perioada if f.luna else None,

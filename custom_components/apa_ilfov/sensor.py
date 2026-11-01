@@ -29,6 +29,8 @@ def _rezumat(f: Factura) -> dict[str, Any]:
         "emisa": f.emisa,
         "scadenta": f.scadenta,
         "total": f.total,
+        "curenta": f.curenta,
+        "sold": f.sold,
         "apa_m3": f.apa.cantitate if f.apa else None,
         "canal_m3": f.canal.cantitate if f.canal else None,
         "apa_lei": round(f.apa.valoare + f.apa.tva, 2) if f.apa else None,
@@ -57,7 +59,7 @@ def _total_12(d: ApaData) -> float | None:
         return None
     ultima = d.istoric[-1]
     limita = ultima.an * 12 + ultima.luna - 11
-    return round(sum(f.total for f in d.istoric if f.an * 12 + f.luna >= limita), 2)
+    return round(sum(f.curenta for f in d.istoric if f.an * 12 + f.luna >= limita), 2)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -96,7 +98,7 @@ SENSORS: tuple[ApaSensorDescription, ...] = (
         translation_key="index_apometru",
         device_class=SensorDeviceClass.WATER,
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         suggested_display_precision=0,
         value_fn=lambda d: (
             _ultima_cu_pdf(d).apa.index_nou

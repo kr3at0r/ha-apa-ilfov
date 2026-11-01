@@ -11,8 +11,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
 from typing import Any
 
-# Număr în format românesc: 1.234,56 sau 234,56 (separator de mii opțional)
-NUM = r"\d{1,3}(?:\.\d{3})+,\d{2}|\d+,\d{2}"
+# Număr în format românesc: 1.234,56 sau 234,56 (separator de mii opțional, minus pentru stornări)
+NUM = r"-?\d{1,3}(?:\.\d{3})+,\d{2}|-?\d+,\d{2}"
 _NUM_RE = re.compile(NUM)
 
 MONTHS = {
@@ -65,12 +65,15 @@ class Factura:
     scadenta: str | None = None  # ISO
     luna: int = 0
     an: int = 0
-    total: float = 0.0
+    total: float = 0.0  # TOTAL DE PLATA (include soldul anterior)
+    curenta: float = 0.0  # valoarea facturii curente (fără sold)
+    sold: float = 0.0  # sold anterior (negativ = credit, pozitiv = restanță)
+    alte: float = 0.0  # alte servicii (ex. punere în funcțiune racord), cu TVA
     persoane: int | None = None
     apa: Linie | None = None
     canal: Linie | None = None
     sursa: str = "pdf"  # pdf | mail
-    ajustare: float = 0.0  # total − suma liniilor (negativ = credit / sold anterior)
+    ajustare: float = 0.0  # = sold, păstrat pentru compatibilitate
     avertismente: list[str] = field(default_factory=list)
 
     @property
@@ -173,8 +176,19 @@ def parse_pdf_text(text: str) -> Factura:
         elif m.group(6) == "CANAL" and f.canal is None:
             f.canal = ln
 
-    if f.apa is None:
+    cm = re.search(rf"Factura curenta\s+\S+\s*/\s*({NUM})", flat)
+    sm_ = re.search(rf"({NUM})\s*Sold la data", flat)
+    f.sold = ro_num(sm_.group(1)) if sm_ else 0.0
+    f.ajustare = f.sold
+    for m in re.finditer(rf"({NUM})\d\s*BUC\s+({NUM})\s+({NUM})\s+({NUM})", flat):
+        f.alte = round(f.alte + ro_num(m.group(1)) + ro_num(m.group(4)), 2)
+
+    if f.apa is None and not f.alte:
         raise ParseError("linia de apă nu a fost găsită")
+    if cm:
+        f.curenta = ro_num(cm.group(1))
+    else:
+        f.curenta = round(f.total - f.sold, 2)
 
     _verifica(f)
     return f
@@ -190,14 +204,11 @@ def _verifica(f: Factura) -> None:
         if ln.index_nou is not None and ln.index_vechi is not None:
             if abs((ln.index_nou - ln.index_vechi) - ln.cantitate) > TOL:
                 w.append(f"{nume}: index nou − vechi ≠ cantitate")
-    suma = sum((ln.valoare + ln.tva) for ln in (f.apa, f.canal) if ln)
-    if f.total and abs(suma - f.total) > 0.02:
-        f.ajustare = round(f.total - suma, 2)
-        if f.ajustare > 0:
-            # total mai mare decât liniile: ceva în plus (penalități etc.) -> de verificat
-            w.append("suma liniilor ≠ total de plată")
-        # total mai mic: credit / sold anterior (ex. regularizare după schimbarea
-        # apometrului) -> doar informativ, vezi `ajustare`
+    suma = sum((ln.valoare + ln.tva) for ln in (f.apa, f.canal) if ln) + f.alte
+    if abs(suma - f.curenta) > 0.02:
+        w.append("suma liniilor ≠ valoarea facturii curente")
+    if f.total and abs(f.curenta + f.sold - f.total) > 0.02:
+        w.append("factura curentă + sold ≠ total de plată")
 
 
 def parse_pdf(data: bytes) -> Factura:
@@ -209,10 +220,11 @@ def parse_body(text: str, trimis: datetime | None = None) -> Factura | None:
     t = re.sub(r"<[^>]+>", " ", text or "")
     t = t.replace("&nbsp;", " ")
     t = re.sub(r"\s+", " ", t)
-    m = re.search(r"valoare de (\d+(?:[.,]\d{1,2})?)(?:\s*lei)?", t, re.I)
+    m = re.search(r"valoare de (-?\d+(?:[.,]\d{1,2})?)(?:\s*lei)?", t, re.I)
     if not m:
         return None
     f = Factura(sursa="mail", total=float(m.group(1).replace(",", ".")))
+    f.curenta = f.total
     sm = re.search(r"scadent[aă]\s*:?\s*" + _DATE, t, re.I)
     if sm:
         f.scadenta = _ro_date(sm.group(1)).isoformat()
