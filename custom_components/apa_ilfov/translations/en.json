@@ -1,0 +1,75 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Apa Ilfov – read invoices from e-mail",
+        "description": "Connects to the mailbox that receives Apa-Canal Ilfov invoices (read only, mail is not marked as read). For Gmail use an app password.",
+        "data": {
+          "username": "E-mail address",
+          "password": "App password",
+          "server": "IMAP server",
+          "port": "Port",
+          "sender": "Invoice sender"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate Apa Ilfov",
+        "description": "The password for {username} no longer works. Enter a new app password.",
+        "data": {
+          "password": "App password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Wrong username or password",
+      "cannot_connect": "Cannot connect to the mail server",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This address is already configured",
+      "reauth_successful": "Password updated"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Apa Ilfov options",
+        "data": {
+          "only_with_sewer": "Ignore invoices without sewer (old meter)",
+          "scan_minutes": "Check mail every (minutes)",
+          "folder": "IMAP folder (INBOX or \"[Gmail]/All Mail\")"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ultima_factura": {
+        "name": "Latest invoice"
+      },
+      "scadenta": {
+        "name": "Due date"
+      },
+      "index_apometru": {
+        "name": "Meter index"
+      },
+      "consum_apa": {
+        "name": "Water use (latest invoice)"
+      },
+      "consum_canal": {
+        "name": "Sewer use (latest invoice)"
+      },
+      "total_12_luni": {
+        "name": "Total last 12 months"
+      },
+      "numar_facturi": {
+        "name": "Invoices in history"
+      }
+    },
+    "binary_sensor": {
+      "factura_de_verificat": {
+        "name": "Invoice needs checking"
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Apă Ilfov – citire facturi din e-mail",
+        "description": "Se conectează la căsuța de e-mail unde primești facturile Apa-Canal Ilfov (doar citire, mesajele nu sunt marcate ca citite). Pentru Gmail folosește o parolă de aplicație.",
+        "data": {
+          "username": "Adresa de e-mail",
+          "password": "Parola de aplicație",
+          "server": "Server IMAP",
+          "port": "Port",
+          "sender": "Expeditor facturi"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautentificare Apă Ilfov",
+        "description": "Parola pentru {username} nu mai funcționează. Introdu o parolă de aplicație nouă.",
+        "data": { "password": "Parola de aplicație" }
+      }
+    },
+    "error": {
+      "invalid_auth": "Utilizator sau parolă greșite",
+      "cannot_connect": "Nu mă pot conecta la serverul de e-mail",
+      "unknown": "Eroare neașteptată"
+    },
+    "abort": {
+      "already_configured": "Această adresă este deja configurată",
+      "reauth_successful": "Parola a fost actualizată"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opțiuni Apă Ilfov",
+        "data": {
+          "only_with_sewer": "Ignoră facturile fără canalizare (apometru vechi)",
+          "scan_minutes": "Verificare e-mail la (minute)",
+          "folder": "Folder IMAP (INBOX sau „[Gmail]/All Mail”)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ultima_factura": { "name": "Ultima factură" },
+      "scadenta": { "name": "Scadență" },
+      "index_apometru": { "name": "Index apometru" },
+      "consum_apa": { "name": "Consum apă (ultima factură)" },
+      "consum_canal": { "name": "Consum canal (ultima factură)" },
+      "total_12_luni": { "name": "Total ultimele 12 luni" },
+      "numar_facturi": { "name": "Facturi în istoric" }
+    },
+    "binary_sensor": {
+      "factura_de_verificat": { "name": "Factură de verificat" }
+    }
+  }
+}
