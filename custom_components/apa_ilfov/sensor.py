@@ -149,7 +149,7 @@ SENSORS: tuple[ApaSensorDescription, ...] = (
         translation_key="numar_facturi",
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda d: len(d.istoric),
-        attrs_fn=lambda d: {"ignorate_fara_canal": d.ignorate},
+        attrs_fn=lambda d: {"ignorate_mai_vechi": d.ignorate},
     ),
 )
 

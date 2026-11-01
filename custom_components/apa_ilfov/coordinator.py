@@ -19,11 +19,12 @@ from .const import (
     CONF_SERVER,
     CONF_USERNAME,
     DEFAULT_FOLDER,
+    DEFAULT_FROM_YEAR,
     DEFAULT_SCAN_MINUTES,
     DOMAIN,
     EVENT_NEW_INVOICE,
     OPT_FOLDER,
-    OPT_ONLY_SEWER,
+    OPT_FROM_YEAR,
     OPT_SCAN_MINUTES,
     STORAGE_VERSION,
 )
@@ -158,9 +159,10 @@ class ApaIlfovCoordinator(DataUpdateCoordinator[ApaData]):
         )
 
     def _calculeaza(self) -> ApaData:
-        doar_canal = bool(self.config_entry.options.get(OPT_ONLY_SEWER, True))
+        din_an = int(self.config_entry.options.get(OPT_FROM_YEAR, DEFAULT_FROM_YEAR))
         pdfs = [f for f in self._facturi.values() if f.sursa == "pdf"]
-        istoric = [f for f in pdfs if (f.canal is not None or not doar_canal)]
+        # facturile emise de la `din_an` încoace (apometrul vechi, fără canal, apare cu canal=None)
+        istoric = [f for f in pdfs if f.emisa and int(f.emisa[:4]) >= din_an]
         istoric.sort(key=lambda f: (f.an, f.luna))
         ignorate = len(pdfs) - len(istoric)
 

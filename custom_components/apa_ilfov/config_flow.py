@@ -16,13 +16,14 @@ from .const import (
     CONF_SERVER,
     CONF_USERNAME,
     DEFAULT_FOLDER,
+    DEFAULT_FROM_YEAR,
     DEFAULT_PORT,
     DEFAULT_SCAN_MINUTES,
     DEFAULT_SENDER,
     DEFAULT_SERVER,
     DOMAIN,
     OPT_FOLDER,
-    OPT_ONLY_SEWER,
+    OPT_FROM_YEAR,
     OPT_SCAN_MINUTES,
 )
 
@@ -105,7 +106,7 @@ class ApaIlfovOptionsFlow(OptionsFlow):
         o = self.config_entry.options
         schema = vol.Schema(
             {
-                vol.Required(OPT_ONLY_SEWER, default=o.get(OPT_ONLY_SEWER, True)): bool,
+                vol.Required(OPT_FROM_YEAR, default=o.get(OPT_FROM_YEAR, DEFAULT_FROM_YEAR)): vol.All(int, vol.Range(min=2000, max=2100)),
                 vol.Required(
                     OPT_SCAN_MINUTES, default=o.get(OPT_SCAN_MINUTES, DEFAULT_SCAN_MINUTES)
                 ): vol.All(int, vol.Range(min=15, max=1440)),

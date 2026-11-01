@@ -15,7 +15,9 @@
       "reauth_confirm": {
         "title": "Reautentificare Apă Ilfov",
         "description": "Parola pentru {username} nu mai funcționează. Introdu o parolă de aplicație nouă.",
-        "data": { "password": "Parola de aplicație" }
+        "data": {
+          "password": "Parola de aplicație"
+        }
       }
     },
     "error": {
@@ -33,25 +35,41 @@
       "init": {
         "title": "Opțiuni Apă Ilfov",
         "data": {
-          "only_with_sewer": "Ignoră facturile fără canalizare (apometru vechi)",
           "scan_minutes": "Verificare e-mail la (minute)",
-          "folder": "Folder IMAP (INBOX sau „[Gmail]/All Mail”)"
+          "folder": "Folder IMAP (INBOX sau „[Gmail]/All Mail”)",
+          "from_year": "Include facturile emise din anul"
         }
       }
     }
   },
   "entity": {
     "sensor": {
-      "ultima_factura": { "name": "Ultima factură" },
-      "scadenta": { "name": "Scadență" },
-      "index_apometru": { "name": "Index apometru" },
-      "consum_apa": { "name": "Consum apă (ultima factură)" },
-      "consum_canal": { "name": "Consum canal (ultima factură)" },
-      "total_12_luni": { "name": "Total ultimele 12 luni" },
-      "numar_facturi": { "name": "Facturi în istoric" }
+      "ultima_factura": {
+        "name": "Ultima factură"
+      },
+      "scadenta": {
+        "name": "Scadență"
+      },
+      "index_apometru": {
+        "name": "Index apometru"
+      },
+      "consum_apa": {
+        "name": "Consum apă (ultima factură)"
+      },
+      "consum_canal": {
+        "name": "Consum canal (ultima factură)"
+      },
+      "total_12_luni": {
+        "name": "Total ultimele 12 luni"
+      },
+      "numar_facturi": {
+        "name": "Facturi în istoric"
+      }
     },
     "binary_sensor": {
-      "factura_de_verificat": { "name": "Factură de verificat" }
+      "factura_de_verificat": {
+        "name": "Factură de verificat"
+      }
     }
   }
 }

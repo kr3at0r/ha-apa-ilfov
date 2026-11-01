@@ -35,9 +35,9 @@
       "init": {
         "title": "Apa Ilfov options",
         "data": {
-          "only_with_sewer": "Ignore invoices without sewer (old meter)",
           "scan_minutes": "Check mail every (minutes)",
-          "folder": "IMAP folder (INBOX or \"[Gmail]/All Mail\")"
+          "folder": "IMAP folder (INBOX or \"[Gmail]/All Mail\")",
+          "from_year": "Include invoices issued from year"
         }
       }
     }
